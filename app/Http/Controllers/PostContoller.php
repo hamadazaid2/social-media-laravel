@@ -14,7 +14,17 @@ class PostContoller extends Controller
      */
     public function index()
     {
-        return view('posts.index', ['posts' => Post::latest()->with('user')->get()]);
+        return view('posts.index', [
+            'posts' => Post::latest()
+                ->with([
+                    'user',
+                    'comments' => function ($query) {
+                        $query->latest()->take(3);
+                    },
+
+                ])->withCount('reactions')
+                ->get()
+        ]);
     }
 
     /**
