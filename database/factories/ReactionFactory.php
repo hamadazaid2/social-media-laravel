@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Reaction>
  */
-class PostFactory extends Factory
+class ReactionFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +18,7 @@ class PostFactory extends Factory
     {
         return [
             'user_id' => fake()->numberBetween(1, 30),
-            'category_lookup_id' => fake()->numberBetween(1, 10),
-            'content' => fake()->paragraph(3, true),
+            'post_id' => fake()->numberBetween(1, 100),
         ];
     }
 }
