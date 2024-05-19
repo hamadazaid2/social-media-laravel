@@ -13,7 +13,7 @@ class CategoryLookupController extends Controller
      */
     public function index()
     {
-        return view("category.index", [
+        return view("categories.index", [
             "categories" => CategoryLookup::all()
         ]);
     }
@@ -23,7 +23,7 @@ class CategoryLookupController extends Controller
      */
     public function create()
     {
-        return view("category.create");
+        return view("categories.create");
     }
 
     /**
@@ -49,7 +49,7 @@ class CategoryLookupController extends Controller
      */
     public function edit(CategoryLookup $category)
     {
-        return view('category.edit', compact('category'));
+        return view('categories.edit', compact('category'));
     }
 
     /**

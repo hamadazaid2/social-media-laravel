@@ -18,7 +18,7 @@ class PostFactory extends Factory
     {
         return [
             'user_id' => fake()->numberBetween(1, 30),
-            'category_lookup_id' => fake()->numberBetween(1, 2),
+            'category_lookup_id' => fake()->numberBetween(1, 10),
             'content' => fake()->paragraph(3, true),
         ];
     }
