@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
 
     // comments
     Route::resource('/comments', CommentController::class)
-        ->only(['store', 'edit', 'update', 'destroy']);
+        ->only(['store', 'update', 'destroy']);
 
     // reaction
     Route::post('/react', [ReactionController::class, 'likeOrUnlike'])

@@ -143,25 +143,74 @@
                             <div class="mt-6">
                                 <h5 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Comments</h5>
                                 @foreach ($post->comments as $comment)
-                                    <div class="mt-4">
+                                    <div class="mt-4" x-data="{ editing: false, commentText: '{{ $comment->comment }}' }">
                                         <div class="flex items-center space-x-2">
                                             <!-- Commenter Profile Picture -->
                                             <img class="w-8 h-8 rounded-full object-cover"
                                                 src="{{ $comment->user->profile_picture }}"
                                                 alt="{{ $comment->user->name }}">
                                             <!-- Commenter Name and Content -->
-                                            <div>
+                                            <div class="flex-1">
                                                 <p class="text-sm font-semibold text-gray-800 dark:text-gray-300">
                                                     {{ $comment->user->name }}
                                                 </p>
-                                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                                    {{ $comment->comment }}
-                                                </p>
+                                                <div x-show="!editing">
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                        {{ $comment->comment }}
+                                                    </p>
+                                                </div>
+                                                <form method="POST" action="{{ route('comments.update', $comment) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <div x-show="editing" class="flex space-x-2">
+                                                        <input type="text" x-model="commentText"
+                                                            class="w-full p-1 border rounded" name="comment" />
+                                                        <button @click="editing = false; $refs.editForm.submit()"
+                                                            class="px-2 py-1 bg-green-600 text-white rounded hover:bg-green-500">Save</button>
+                                                        <button @click="editing = false"
+                                                            class="px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-500">Cancel</button>
+                                                    </div>
+                                                </form>
                                             </div>
+                                            @if ($comment->user->id === auth()->user()->id)
+                                                <!-- Settings Dropdown -->
+                                                <div class="relative" x-data="{ open: false }">
+                                                    <button @click="open = !open"
+                                                        class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400">
+                                                        <!-- Three Dots Icon -->
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M12 6h.01M12 12h.01M12 18h.01" />
+                                                        </svg>
+                                                    </button>
+                                                    <!-- Dropdown Menu -->
+                                                    <div x-show="open" @click.away="open = false"
+                                                        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 shadow-lg rounded-lg py-1">
+                                                        <a href="javascript:void(0)"
+                                                            @click="editing = true; open = false"
+                                                            class="block px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Edit</a>
+                                                        <form method="POST"
+                                                            action="{{ route('comments.destroy', $comment) }}">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                class="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
+                                        <form x-ref="editForm" method="POST"
+                                            action="{{ route('comments.update', $comment) }}" style="display: none;">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="comment" :value="commentText">
+                                        </form>
                                     </div>
                                 @endforeach
                             </div>
+
                         </div>
                     </div>
                 </div>
