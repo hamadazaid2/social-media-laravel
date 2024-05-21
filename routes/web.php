@@ -20,22 +20,38 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // auth
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('/categories', CategoryLookupController::class);
-    Route::resource('/posts', PostController::class);
-    Route::get('/my-posts', [PostController::class, 'myPosts'])->name('posts.my-posts');
+    // categories 
+    Route::resource('/categories', CategoryLookupController::class)
+        ->except('show');
 
-    Route::resource('/comments', CommentController::class);
-    Route::post('/react', [ReactionController::class, 'likeOrUnlike'])->name('reaction');
+    // posts
+    Route::resource('/posts', PostController::class)
+        ->except('show');
+    Route::get('/my-posts', [PostController::class, 'myPosts'])
+        ->name('posts.my-posts');
 
-    Route::resource('followers', FollowerController::class);
-    Route::delete('followers/{follower_user_id}', [FollowerController::class, 'destroy'])->name('followers.custom_destroy');
+    // comments
+    Route::resource('/comments', CommentController::class)
+        ->only(['store', 'edit', 'update', 'destroy']);
 
-    // Route::post('/follow/{follower_user_id}', [FollowerController::class, 'follow'])->name('follow');
-    // Route::delete('/unfollow/{follower_user_id}', [ReactionController::class, 'unfollow'])->name('unfollow');
+    // reaction
+    Route::post('/react', [ReactionController::class, 'likeOrUnlike'])
+        ->name('reaction');
+
+    // followers
+    Route::resource('followers', FollowerController::class)
+        ->only([
+            'index',
+            'store',
+            'destroy',
+        ]);
+    Route::delete('followers/{follower_user_id}', [FollowerController::class, 'destroy'])
+        ->name('followers.custom_destroy');
 });
 
 require __DIR__ . '/auth.php';
