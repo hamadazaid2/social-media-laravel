@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\CategoryLookup;
 use App\Models\Post;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -15,33 +14,35 @@ class PostController extends Controller
     public function index()
     {
         return view('posts.index', [
-            'posts' => Post::latest()
-                ->with([
-                    'user',
-                    'comments' => function ($query) {
-                        $query->latest()->take(3);
-                    },
-
-                ])->withCount('reactions')
-                ->paginate(10)
+            'posts' => $this->getPostsQuery()->paginate(10)
         ]);
     }
 
     public function myPosts()
     {
         return view('posts.my-posts', [
-            'posts' => Post::where('user_id', auth()->user()->id)->latest()
-                ->with([
-                    'user',
-                    'comments' => function ($query) {
-                        $query->latest()->take(3);
-                    },
-
-                ])->withCount('reactions')
-                ->paginate(10)
+            'posts' => $this->getPostsQuery(auth()->user()->id)->paginate(10)
         ]);
     }
 
+    private function getPostsQuery($userId = null)
+    {
+        $query = Post::latest()
+            ->with([
+                'user',
+                'comments' => function ($query) {
+                    $query->latest()->take(3);
+                },
+                'comments.user'
+            ])
+            ->withCount('reactions');
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        return $query;
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -60,14 +61,6 @@ class PostController extends Controller
     {
         $request->user()->posts()->create($request->validated());
         return redirect()->route('posts.index')->with('success', 'Post just published!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**
