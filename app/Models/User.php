@@ -64,4 +64,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reaction::class);
     }
+
+    public function followings(): HasMany
+    {
+        return $this->hasMany(Follower::class, 'following_user_id');
+    }
+
+    public function followers(): HasMany
+    {
+        return $this->hasMany(Follower::class, 'follower_user_id');
+    }
+
+    public function isFollowing($following_user_id): bool
+    {
+        return $this->followings()->where('follower_user_id', $following_user_id)->exists();
+    }
 }

@@ -7,7 +7,7 @@ use App\Models\CategoryLookup;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
-class PostContoller extends Controller
+class PostController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +23,22 @@ class PostContoller extends Controller
                     },
 
                 ])->withCount('reactions')
-                ->get()
+                ->paginate(10)
+        ]);
+    }
+
+    public function myPosts()
+    {
+        return view('posts.my-posts', [
+            'posts' => Post::where('user_id', auth()->user()->id)->latest()
+                ->with([
+                    'user',
+                    'comments' => function ($query) {
+                        $query->latest()->take(3);
+                    },
+
+                ])->withCount('reactions')
+                ->paginate(10)
         ]);
     }
 

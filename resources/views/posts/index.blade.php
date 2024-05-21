@@ -20,17 +20,47 @@
                         <div class="flex-1">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <!-- User Name -->
-                                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                        {{ $post->user->name }}
-                                    </h4>
+                                    <!-- User Name and Follow Button -->
+                                    <div class="flex items-center space-x-2">
+                                        <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                            {{ $post->user->name }}
+                                        </h4>
+                                        <!-- Follow Button -->
+                                        @if (Auth::user()->id !== $post->user->id)
+                                            @if (Auth::user()->isFollowing($post->user->id))
+                                                <form
+                                                    action="{{ route('followers.custom_destroy', ['follower_user_id' => $post->user->id]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="follower_user_id"
+                                                        value="{{ $post->user->id }}">
+                                                    <button type="submit"
+                                                        class="px-2 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-500 focus:outline-none focus:bg-red-700">
+                                                        Unfollow
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form
+                                                    action="{{ route('followers.store', ['follower_user_id' => $post->user->id]) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="px-2 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-500 focus:outline-none focus:bg-blue-700">
+                                                        Follow
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @endif
+                                    </div>
                                     <!-- Post Created At -->
                                     <p class="text-sm text-gray-500 dark:text-gray-400">
                                         {{ $post->created_at->diffForHumans() }}
                                     </p>
                                 </div>
                                 <!-- Settings Dropdown -->
-                                <div class="relative" x-data="{ open: false }">
+                                <div class="relative" x-data="{ open: false }"
+                                    x-show="{{ $post->user->id === auth()->user()->id ? 'true' : 'false' }}">
                                     <button @click="open = !open"
                                         class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-400">
                                         <!-- Three Dots Icon -->
@@ -139,8 +169,8 @@
                 <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg" style="color: white"> No
                     Categories Yet!</div>
             @endforelse
+            {{ $posts->links() }}
 
         </div>
-
 
 </x-app-layout>
